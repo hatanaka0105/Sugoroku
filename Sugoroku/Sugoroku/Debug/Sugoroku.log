@@ -1,0 +1,4 @@
+﻿  Player.cpp
+  Board.cpp
+c:\users\game\documents\visual studio 2015\projects\sugoroku\sugoroku\board.cpp(6): error C3931: 'Board': cannot call a function that has restriction specifiers that are incompatible with the ambient context
+  Generating Code...
