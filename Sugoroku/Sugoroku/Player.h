@@ -9,44 +9,52 @@ using namespace std;
 class Player
 {
 private:
-	string name;
-	int position;
-	int index;
-	bool canMove;
-	char icon;
-	int turn;
-	int numDice;
-	bool isHuman;
+	enum{
+		MAX_DICE = 2;// 触れるさいころの最大数
+	}
+	
+	string name_;
+	int position_; // マスの位置
+	int order_;    // 順番
+	bool canMove_; // 休みでないか
+	char icon_;    // 表示用キャラクタ
+	int turn_;     // ???
+	int numDice_;  // 触れるさいころの数
+	bool isHuman_; // AIでないか
 
+	void ResetNumDice() { numDice_ = 1; }
 public:
 	Player();
-	Player(int, char, string, bool);
-	Player* Get() { return this; }
-	string GetName() { return this->name; }
-	void Move(int step) {
-		if (turn > 0) { position += step; }
-	}
-	void ChangePos(int value) { this->position = value; }
-	int GetPos() { return this->position; }
-	void ChangeNumTurn(int turn) { 
-		if (turn < 0) { this->turn = 0; }
-		if (turn > 2) { this->turn = 2; }
-		this->turn = turn;
-	}
-	void AddTurn() { this->turn++; }
-	void ChangeNumDice(int number) {
-		if (number < 1) { this->numDice = 1; }
-		if (number > 2) { this->numDice = 2; }
-		this->numDice = number; }
-	void ResetNumDice() { this->numDice = 1; }
-	int GetNumDice() { return numDice; }
+	Player(int index, char icon, string name, bool isHuman);
 
-	int GetOrder() { return this->index; }
-	bool CanMove() { if (this->turn > 0) { return true; } else { return false; } }
-	int GetTurn() { return this->turn; }
-	char GetIcon() { return this->icon; }
-	bool IsHuman() { return this->isHuman; }
-	void Swap(Player);
+//	Player* Get() { return this; }
+
+	const string &GetName() const { return name_; }
+	int GetOrder() const { return order_; }
+	char GetIcon() const { return icon_; }
+	bool IsHuman() const { return isHuman_; }
+	
+	// 位置
+	int GetPos() const { return position_; }
+	bool CanMove() const { return (turn_ > 0); }
+	void Move(int step) {if (turn_ > 0) { position_ += step; }}
+	void SetPos(int pos) { position_ = pos; }
+	void Swap(Player &target) ;// SwapPos
+
+	// turn
+	int GetTurn() const { return turn_; }
+	void ChangeNumTurn(int turn) {turn_ = std::clamp(turn, 0, MAX_DICE);}
+	void AddTurn();
+
+	// さいころの数
+	int GetNumDice() const { return numDice; }
+	void ChangeNumDice(int number) {numDice _ = std::clamp(number, 1, MAX_DICE);}
 };
+void Player::AddTurn() 
+{
+	ResetNumDice();// ターン終わりにはさいころの数を戻す
+	turn_++; 
+}
+
 
 #endif
