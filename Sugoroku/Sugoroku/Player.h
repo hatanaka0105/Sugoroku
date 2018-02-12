@@ -50,11 +50,6 @@ public:
 	int GetNumDice() const { return numDice; }
 	void ChangeNumDice(int number) {numDice _ = std::clamp(number, 1, MAX_DICE);}
 };
-void Player::AddTurn() 
-{
-	ResetNumDice();// ターン終わりにはさいころの数を戻す
-	turn_++; 
-}
 
 
 #endif
