@@ -7,20 +7,20 @@ namespace sqStat
 {
 	enum Type
 	{
-		Blank,
-		StepBack,
-		StepForward,
-		LoseTurn,
-		DoubleUp,
+		Blank,		//通常マス
+		StepBack,	//一つ戻る
+		StepForward,	//一つ進む
+		LoseTurn,	//一回休み
+		DoubleUp,	//次のターン、2回サイコロを振れる
 	};
 
 	class Square
 	{
 	private:
-		int Position;
-		Type type;
-		int effectAmount;
-		string color;
+		int position_;
+		Type type_;
+		int effectAmount_;
+		string color_;
 	public:
 		void Initialize();
 		void Initialize(Type, int);
