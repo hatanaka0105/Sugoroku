@@ -21,3 +21,9 @@ void Player::Swap(Player opponent)
 	Player::ChangePos(opponent.GetPos());
 	opponent.ChangePos(ownPos);
 };
+
+void Player::AddTurn() 
+{
+	ResetNumDice();// ターン終わりにはさいころの数を戻す
+	turn_++; 
+}
