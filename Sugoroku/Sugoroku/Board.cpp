@@ -8,24 +8,49 @@ Board::Board(int BoardLength)
 
 	random_device rnd;
 	mt19937 mt(rnd());
-	uniform_int_distribution<int> dist(0, sqStat::DoubleUp * 2);
-	uniform_int_distribution<int> effectDist(1, 2);
+	
+	//各マスの分布
+	uniform_int_distribution<int> dist(0, sqStat::Swap * 2);
+	
+	//前進、後退マスの効果の振り幅
+	uniform_int_distribution<int> effectDist(1, 4);
 
 	for (int i = 0; i < Board::boardLength; i++)
 	{
 		int numTypes = dist(mt);
 
-		if(numTypes == sqStat::Blank || i == 0 || i == Board::boardLength)
+		switch (numTypes)
+		{
+		case sqStat::Blank:
 			Board::square[i].Initialize();
-		else if(numTypes == sqStat::StepBack)
+			break;
+
+		case sqStat::StepBack:
 			Board::square[i].Initialize(sqStat::StepBack, effectDist(mt));
-		else if (numTypes == sqStat::StepForward)
+			break;
+
+		case sqStat::StepForward:
 			Board::square[i].Initialize(sqStat::StepForward, effectDist(mt));
-		else if (numTypes == sqStat::LoseTurn)
+			break;
+
+		case sqStat::LoseTurn:
 			Board::square[i].Initialize(sqStat::LoseTurn, 1);
-		else if (numTypes == sqStat::DoubleUp)
-			Board::square[i].Initialize(sqStat::DoubleUp, effectDist(mt));
-		else
+			break;
+
+		case sqStat::DoubleUp:
+			Board::square[i].Initialize(sqStat::DoubleUp, 2);
+			break;
+
+		case sqStat::Swap:
+			Board::square[i].Initialize(sqStat::Swap, 0);
+
+		default:
 			Board::square[i].Initialize();
+			break;
+		}
+
+		//最初、最後のマスは空白に
+		Board::square[0].Initialize();
+		Board::square[boardLength - 1].Initialize();
 	}
 };

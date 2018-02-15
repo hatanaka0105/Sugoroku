@@ -17,22 +17,35 @@ class Scene
 {
 private:
 	list<Player> players;
+	Player* precedingPlayer;
+
 	Board board;
-	int time;
+
+	int numTurn;
 	int drawIndex;
+
 	mt19937 mt;
 	uniform_int_distribution<int> diceDist;
 	uniform_int_distribution<int> playerOrderDist;
 	uniform_int_distribution<int> squareStateDist;
-	string WinnerName;
+
+	bool isGoal;
+	string winnerName;
+
 public:
 	Scene();
-	void TimeUpdate() { time++; }
-	int DiceRoll();
-	void RunnningSequence();
+
+	void TurnUpdate() { numTurn++; }
+
+	void Run();
+	int RollDice(Player*);
+	void ProcessMovement(Player*, int);
+	void MovePlayerByStep(Player*, int, int);
+
 	void Draw();
-	void DrawFrame(string, string, string, int);
+	void DrawRowFrame(string, string, string, int);
 	void DrawPlayerSpace(string, string, string, string, int);
+
 	void Result();
 };
 

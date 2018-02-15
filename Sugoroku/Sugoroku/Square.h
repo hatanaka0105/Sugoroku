@@ -9,9 +9,10 @@ namespace sqStat
 	{
 		Blank,		//通常マス
 		StepBack,	//一つ戻る
-		StepForward,	//一つ進む
+		StepForward,//一つ進む
 		LoseTurn,	//一回休み
 		DoubleUp,	//次のターン、2回サイコロを振れる
+		Swap,		//他のプレイヤーと位置を入れ替える
 	};
 
 	class Square
@@ -25,7 +26,7 @@ namespace sqStat
 		void Initialize();
 		void Initialize(Type, int);
 		void SquareChange(Type state) { type_ = state; }
-		void Effect(Player*);
+		void ApplyEffect(Player*, Player*);
 		Type GetType() { return type_; }
 	};
 };

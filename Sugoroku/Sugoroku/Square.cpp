@@ -14,7 +14,7 @@ void Square::Initialize(sqStat::Type type, int amount)
 	Square::effectAmount_ = amount;
 };
 
-void Square::Effect(Player *target)
+void Square::ApplyEffect(Player *target, Player *swapTarget)
 {
 	switch (Square::type_)
 	{
@@ -22,24 +22,42 @@ void Square::Effect(Player *target)
 		break;
 
 	case Type::StepForward:
-
 		cout << effectAmount_ << "マス進む\n";
-		target->Move(effectAmount_);
+		target->SetDestination(effectAmount_);
+
 		break;
 
 	case Type::StepBack:
-		cout << effectAmount_ << "マス戻る\n";
-		target->Move(-effectAmount_);
+		if (target->GetPos() > effectAmount_)
+		{
+			cout << effectAmount_ << "マス戻る\n";
+			target->SetDestination(-effectAmount_);
+		}
+		else
+		{
+			cout << target->GetPos() << "マス戻る\n";
+			//スタート地点を通り過ぎてしまう場合
+			target->SetDestination(-target->GetPos());
+		}
+
 		break;
 
 	case Type::LoseTurn:
 		cout << effectAmount_ << "回休み\n";
 		target->ChangeNumTurn(-effectAmount_);
+
 		break;
 
 	case Type::DoubleUp:
-		cout << "次のターン、サイコロをさらに " << effectAmount_ << " 回振れる\n";
+		cout << "次のターン、サイコロをさらに " << effectAmount_ - 1 << " 回振れる\n";
 		target->ChangeNumDice(effectAmount_);
+
+		break;
+		
+	case Type::Swap:
+		cout << "最もゴールに近いプレイヤーと位置を入れ替える";
+		target->SwapPos(*swapTarget);
+
 		break;
 	}
 };

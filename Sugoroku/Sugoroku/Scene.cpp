@@ -1,8 +1,8 @@
 #include "Scene.h"
 
-#define numPlayer 4
-#define wait 500
-#define wait_more 900
+#define NumPlayer 4
+#define WaitTime 500
+#define WaitTime_Long 900
 
 Scene::Scene()
 {
@@ -13,7 +13,7 @@ Scene::Scene()
 	//ダイス用
 	diceDist = uniform_int_distribution<int>(1, 6);
 	//プレイヤーの順番用
-	playerOrderDist = uniform_int_distribution<int>(0, numPlayer);
+	playerOrderDist = uniform_int_distribution<int>(0, NumPlayer);
 	//マス生成用
 	squareStateDist = uniform_int_distribution<int>(0, sqStat::Type::DoubleUp);
 	
@@ -29,7 +29,7 @@ Scene::Scene()
 	cout << "ゲームが始まります";
 	cin.clear();
 	cin.ignore(500,'\n');
-	Sleep(wait);
+	Sleep(WaitTime);
 
 	Player player = Player(0, icon, name, true);
 	Player NPC1 = Player(1, 'C', "Curly", false);
@@ -46,106 +46,159 @@ Scene::Scene()
 	Draw();
 };
 
-int Scene::DiceRoll()
-{
-	return diceDist(mt);
-};
 
-void Scene::RunnningSequence()
+void Scene::Run()
 {
 	for (;;)
 	{
-		TimeUpdate();
+		TurnUpdate();
 
 		//イテレータを生成してリストに登録されたプレイヤー毎に行動する
-		for (auto Character = players.begin(); Character != players.end(); ++Character)
+		for (auto player = players.begin(); player != players.end(); ++player)
 		{
-			cout << Character->GetName() << "の手番です\n";
+			cout << player->GetName() << "の手番です\n";
 
-			if (Character->IsHuman())
+			Sleep(WaitTime);
+
+			if (player->CanMove())
 			{
-				cout << "Enterキーでサイコロを振ります\n";
-				getchar();
-			}
+				int numRollOfDice = RollDice(&(*player));
 
-			int roll = 0;
-			int sum = 0;
-
-			if (Character->GetTurn() < 1)
-				Character->AddTurn();
-
-			cout << "出た目の数は...";
-			roll = DiceRoll();
-			sum += roll;
-			cout << sum;
-			for (int i = 1; i < Character->GetNumDice(); i++)
-			{
-				Sleep(wait);
-				roll = DiceRoll();
-				sum += roll;
-
-				if (Character->GetNumDice() > 1)
-				{
-					cout << "+" << roll;
-				}
-			}
-			if (Character->GetNumDice() > 1)
-			{
-				cout << " = " << sum;
-			}
-			cout << "です\n";
-			Sleep(wait);
-			Character->ResetNumDice();
-
-			//動けるかどうか
-			if (Character->CanMove())
-			{
-				//移動
-				Character->Move(sum);
-				Draw();
-				Sleep(wait_more);
-
-				//移動先のマスの効果適用
-				board.GetSquare(Character->GetPos()).Effect(&(*Character));
-				if (board.GetSquare(Character->GetPos()).GetType() != sqStat::Blank)
-					Sleep(wait_more);
-				Draw();
-
-				//ゴール(効果マスでゴールする可能性があるのでここで取る)
-				if (Character->GetPos() >= 30)
-				{
-					Character->SetPos(board.Length());
-					Draw();
-					WinnerName = Character->GetName();
-					return;
-				}
+				ProcessMovement(&(*player), numRollOfDice);
 			}
 			else
 			{
 				cout << "一回休みです";
-				Draw();
+				player->AddTurn();
+			}
+
+			Sleep(WaitTime);
+			Draw();
+
+			if (isGoal)
+			{
+				return;
 			}
 		}
 	}
 };
 
-void Scene::DrawFrame(string first, string middle, string end, int time)
+int Scene::RollDice(Player* player)
+{
+	if (player->IsHuman())
+	{
+		cout << "Enterキーでサイコロを振ります\n";
+		getchar();
+	}
+
+	int roll = 0;
+	int sum = 0;
+
+	if (player->GetTurn() < 1)
+		player->AddTurn();
+
+	cout << "出た目の数は...";
+	Sleep(WaitTime);
+
+	for (int i = 0; i < player->GetNumDice(); i++)
+	{
+		if (i > 0)
+		{
+			cout << " + ";
+			Sleep(WaitTime);
+		}
+
+		roll = diceDist(mt);
+		sum += roll;
+		cout << roll;
+		Sleep(WaitTime);
+	}
+
+	if (player->GetNumDice() > 1)
+	{
+		cout << " = " << sum;
+
+		player->ResetNumDice();
+	}
+
+	cout << "です\n";
+	Sleep(WaitTime);
+
+	return sum;
+};
+
+void Scene::ProcessMovement(Player* player, int numRollOfDice)
+{
+	//移動(1マスずつ移動する演出)
+	MovePlayerByStep(player, numRollOfDice, 1);
+
+	//移動先のマスの効果適用
+	board.GetSquare(player->GetPos()).ApplyEffect(&(*player), precedingPlayer);
+	if (board.GetSquare(player->GetPos()).GetType() != sqStat::Blank)
+	{
+		Sleep(WaitTime_Long);
+
+		if (player->GetDestination() > 0)
+		{
+			MovePlayerByStep(player, player->GetDestination(), 1);
+		}
+		else if (player->GetDestination() < 0)
+		{
+			MovePlayerByStep(player, -player->GetDestination(), -1);
+		}
+	}
+}
+
+void Scene::MovePlayerByStep(Player* player, int numSteps, int step)
+{
+	for (int i = 0; i < numSteps; i++)
+	{
+		player->Move(step);
+		Draw();
+		Sleep(WaitTime);
+
+		if (player->GetPos() >= 30)
+		{
+			player->SetPos(board.Length());
+			Draw();
+			winnerName = player->GetName();
+			isGoal = true;
+			return;
+		}
+	}
+
+	player->SetDestination(0);
+
+	for (auto itr = players.begin(); itr != players.end(); ++itr) {
+		if (player->GetPos() < itr->GetPos())
+		{
+			break;
+		}
+		
+		if(player->GetPos() > itr->GetPos())
+		{
+			precedingPlayer = &(*player);
+		}
+	}
+}
+
+void Scene::DrawRowFrame(string first, string middle, string end, int numTurn)
 {
 	cout << first;
-	for (int j = 0; j < time; j++)
+	for (int j = 0; j < numTurn; j++)
 	{
 		cout << middle;
 	}
 	cout << end;
 };
 
-void Scene::DrawPlayerSpace(string first, string middle, string space, string end, int time)
+void Scene::DrawPlayerSpace(string first, string middle, string space, string end, int numTurn)
 {
 	cout << first;
-	for (int j = 0; j <= time - 1; j++)
+	for (int j = 0; j <= numTurn - 1; j++)
 	{
 		drawIndex++;
-		
+
 		cout << middle;
 
 		for (auto Character = players.begin(); Character != players.end(); ++Character)
@@ -161,7 +214,7 @@ void Scene::DrawPlayerSpace(string first, string middle, string space, string en
 		}
 	}
 
-	cout << middle << end;
+	cout << end;
 };
 
 void Scene::Draw()
@@ -170,16 +223,16 @@ void Scene::Draw()
 
 	system("cls");
 
-	DrawFrame("┌", "──┬", "──┐\n", 9);
+	DrawRowFrame("┌", "─────┬", "─────┐\n", 9);
 
 	for (int i = 0; i < 2; i++)
 	{
-		DrawPlayerSpace("", "│", " ", "\n", 10);
-		DrawFrame("├", "──┼", "──┤\n", 9);
+		DrawPlayerSpace("", "│ ", " ", "│\n", 10);
+		DrawRowFrame("├", "─────┼", "─────┤\n", 9);
 	}
 
-	DrawPlayerSpace("", "│", " ", "\n", 10);
-	DrawFrame("└", "──┴", "──┘\n", 9);
+	DrawPlayerSpace("", "│ ", " ", "│\n", 10);
+	DrawRowFrame("└", "─────┴", "─────┘\n", 9);
 
 	for (auto Character = players.begin(); Character != players.end(); ++Character)
 	{
@@ -196,7 +249,7 @@ void Scene::Draw()
 
 void Scene::Result()
 {
-	cout << WinnerName << "がゴール！\n";
-	Sleep(wait);
-	cout << "到達までにかかった回数 : " << time << "\n";
+	cout << winnerName << "がゴール！\n";
+	Sleep(WaitTime);
+	cout << "到達までにかかった回数 : " << numTurn << "\n";
 };

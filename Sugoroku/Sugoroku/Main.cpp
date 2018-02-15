@@ -4,7 +4,7 @@ void main()
 {
 	Scene scene = Scene();
 
-	scene.RunnningSequence();
+	scene.Run();
 
 	scene.Result();
 }

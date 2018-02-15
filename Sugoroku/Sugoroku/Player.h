@@ -16,20 +16,18 @@ private:
 	};
 	
 	string name_;
-	int position_; // マスの位置
-	int order_;    // 順番
-	bool canMove_; // 休みでないか
-	char icon_;    // 表示用キャラクタ
-	int turn_;     // ???
-	int numDice_;  // 触れるさいころの数
-	bool isHuman_; // AIでないか
-
+	int position_;     // マスの位置
+	int order_;        // 順番
+	bool canMove_;     // 休みでないか
+	char icon_;        // 表示用キャラクタ
+	int turn_;         // 動ける回数
+	int numDice_;      // 触れるさいころの数
+	bool isHuman_;     // AIでないか
+	int destination_;  // 何歩進むか
 
 public:
 	Player();
 	Player(int index, char icon, string name, bool isHuman);
-
-//	Player* Get() { return this; }
 
 	const string &GetName() const { return name_; }
 	int GetOrder() const { return order_; }
@@ -41,6 +39,8 @@ public:
 	bool CanMove() const { return (turn_ > 0); }
 	void Move(int step) {if (turn_ > 0) { position_ += step; }}
 	void SetPos(int pos) { position_ = pos; }
+	void SetDestination(int dest) { destination_ = dest; }
+	int GetDestination() { return destination_; }
 	void SwapPos(Player &target) ;
 
 	// turn
