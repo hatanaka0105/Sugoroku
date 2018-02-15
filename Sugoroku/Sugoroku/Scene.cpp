@@ -106,7 +106,7 @@ void Scene::RunnningSequence()
 				Sleep(wait_more);
 
 				//移動先のマスの効果適用
-				board.GetSquare(Character->GetPos()).Effect(Character->Get());
+				board.GetSquare(Character->GetPos()).Effect(&(*Character));
 				if (board.GetSquare(Character->GetPos()).GetType() != sqStat::Blank)
 					Sleep(wait_more);
 				Draw();
@@ -114,7 +114,7 @@ void Scene::RunnningSequence()
 				//ゴール(効果マスでゴールする可能性があるのでここで取る)
 				if (Character->GetPos() >= 30)
 				{
-					Character->ChangePos(board.Length());
+					Character->SetPos(board.Length());
 					Draw();
 					WinnerName = Character->GetName();
 					return;

@@ -6,24 +6,24 @@ Player::Player()
 
 Player::Player(int PlayerIndex, char CharacterIcon, string name, bool IsHuman)
 {
-	Player::position = 1;
-	Player::index = PlayerIndex;
-	Player::icon = CharacterIcon;
-	Player::numDice = 1;
-	Player::turn = 1;
-	Player::name = name;
-	Player::isHuman = IsHuman;
+	Player::position_ = 1;
+	Player::order_ = PlayerIndex;
+	Player::icon_ = CharacterIcon;
+	Player::numDice_ = 1;
+	Player::turn_ = 1;
+	Player::name_ = name;
+	Player::isHuman_ = IsHuman;
 }
 
-void Player::Swap(Player opponent)
+void Player::SwapPos(Player& opponent)
 {
 	int ownPos = Player::GetPos();
-	Player::ChangePos(opponent.GetPos());
-	opponent.ChangePos(ownPos);
+	Player::SetPos(opponent.GetPos());
+	opponent.SetPos(ownPos);
 };
 
-void Player::AddTurn() 
+
+void Player::AddTurn()
 {
-	ResetNumDice();// ターン終わりにはさいころの数を戻す
 	turn_++; 
 }

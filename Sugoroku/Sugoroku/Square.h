@@ -24,9 +24,9 @@ namespace sqStat
 	public:
 		void Initialize();
 		void Initialize(Type, int);
-		void SquareChange(Type state) { this->type = state; }
+		void SquareChange(Type state) { type_ = state; }
 		void Effect(Player*);
-		Type GetType() { return type; }
+		Type GetType() { return type_; }
 	};
 };
 
