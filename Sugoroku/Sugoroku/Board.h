@@ -1,5 +1,5 @@
-#ifndef _Board_
-#define _Board_
+#ifndef Board_H_
+#define Board_H_
 
 #include <random>
 #include "Square.h"
@@ -10,13 +10,15 @@ using namespace sqStat;
 class Board
 {
 private:
-	int boardLength;
-	vector<Square> square;
+	int boardLength_;
+	vector<Square> square_;
+
 public:
-	Board() {};
+	Board();
 	Board(int BoardLength);
-	int Length() { return boardLength; }
-	Square GetSquare(int index) { return square[index]; }
+	
+	int GetLength() const { return boardLength_; }
+	Square GetSquare(int index) const { return square_[index]; }
 };
 
 #endif

@@ -1,5 +1,7 @@
-#ifndef _Square_
-#define _Square_
+#ifndef Square_H_
+#define Square_H_
+
+#define NUM_SQUARE_TYPE Type::Swap
 
 #include "Player.h"
 
@@ -21,13 +23,16 @@ namespace sqStat
 		int position_;
 		Type type_;
 		int effectAmount_;
-		string color_;
+
 	public:
 		void Initialize();
-		void Initialize(Type, int);
+		void Initialize(Type state, int pos);
+
 		void SquareChange(Type state) { type_ = state; }
-		void ApplyEffect(Player*, Player*);
-		Type GetType() { return type_; }
+
+		void ApplyEffect(Player* player, Player* swapTarget);
+
+		Type GetType() const { return type_; }
 	};
 };
 

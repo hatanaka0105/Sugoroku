@@ -21,9 +21,3 @@ void Player::SwapPos(Player& opponent)
 	Player::SetPos(opponent.GetPos());
 	opponent.SetPos(ownPos);
 };
-
-
-void Player::AddTurn()
-{
-	turn_++; 
-}

@@ -35,8 +35,8 @@ void Square::ApplyEffect(Player *target, Player *swapTarget)
 		}
 		else
 		{
-			cout << target->GetPos() << "マス戻る\n";
 			//スタート地点を通り過ぎてしまう場合
+			cout << target->GetPos() << "マス戻る\n";
 			target->SetDestination(-target->GetPos());
 		}
 
@@ -55,7 +55,9 @@ void Square::ApplyEffect(Player *target, Player *swapTarget)
 		break;
 		
 	case Type::Swap:
-		cout << "最もゴールに近いプレイヤーと位置を入れ替える";
+		cout << "Swapマスです\n";
+		cout << "最もゴールに近いプレイヤーと位置を入れ替える\n";
+		cout << "入れ替え相手は " << swapTarget->GetName() << " です";
 		target->SwapPos(*swapTarget);
 
 		break;

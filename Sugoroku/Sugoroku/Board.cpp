@@ -1,56 +1,64 @@
 #include "Board.h"
 #include <random>
 
+Board::Board()
+{
+	Board(1);
+}
+
 Board::Board(int BoardLength)
 {
-	Board::boardLength = BoardLength;
-	Board::square.resize(Board::boardLength);
+	boardLength_ = BoardLength;
+	square_.resize(boardLength_);
 
 	random_device rnd;
 	mt19937 mt(rnd());
 	
 	//各マスの分布
-	uniform_int_distribution<int> dist(0, sqStat::Swap * 2);
+	uniform_int_distribution<int> dist(0, NUM_SQUARE_TYPE * 2);
 	
 	//前進、後退マスの効果の振り幅
 	uniform_int_distribution<int> effectDist(1, 4);
 
-	for (int i = 0; i < Board::boardLength; i++)
+	for (int i = 0; i < boardLength_; i++)
 	{
-		int numTypes = dist(mt);
+		Square *square = &square_[i];
 
+		//最初、最後のマスは空白
+		if (i == 0 || i == boardLength_ - 1)
+		{
+			square->Initialize();
+			continue;
+		}
+
+		int numTypes = dist(mt);
 		switch (numTypes)
 		{
-		case sqStat::Blank:
-			Board::square[i].Initialize();
-			break;
-
 		case sqStat::StepBack:
-			Board::square[i].Initialize(sqStat::StepBack, effectDist(mt));
+			square->Initialize(sqStat::StepBack, effectDist(mt));
 			break;
 
 		case sqStat::StepForward:
-			Board::square[i].Initialize(sqStat::StepForward, effectDist(mt));
+			square->Initialize(sqStat::StepForward, effectDist(mt));
 			break;
 
 		case sqStat::LoseTurn:
-			Board::square[i].Initialize(sqStat::LoseTurn, 1);
+			square->Initialize(sqStat::LoseTurn, 1);
 			break;
 
 		case sqStat::DoubleUp:
-			Board::square[i].Initialize(sqStat::DoubleUp, 2);
+			square->Initialize(sqStat::DoubleUp, 2);
 			break;
 
 		case sqStat::Swap:
-			Board::square[i].Initialize(sqStat::Swap, 0);
+			square->Initialize(sqStat::Swap, 0);
+			break;
+
+		case sqStat::Blank:
 
 		default:
-			Board::square[i].Initialize();
+			square->Initialize();
 			break;
 		}
-
-		//最初、最後のマスは空白に
-		Board::square[0].Initialize();
-		Board::square[boardLength - 1].Initialize();
 	}
 };

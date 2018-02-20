@@ -1,8 +1,9 @@
 #include "Scene.h"
 
-#define NumPlayer 4
-#define WaitTime 500
-#define WaitTime_Long 900
+#define NUM_PLAYER 4
+#define WAIT_TIME 500
+#define WAIT_TIME_LONG 900
+#define BOARD_LENGTH 40
 
 Scene::Scene()
 {
@@ -13,9 +14,9 @@ Scene::Scene()
 	//ダイス用
 	diceDist = uniform_int_distribution<int>(1, 6);
 	//プレイヤーの順番用
-	playerOrderDist = uniform_int_distribution<int>(0, NumPlayer);
+	playerOrderDist = uniform_int_distribution<int>(0, NUM_PLAYER);
 	//マス生成用
-	squareStateDist = uniform_int_distribution<int>(0, sqStat::Type::DoubleUp);
+	squareStateDist = uniform_int_distribution<int>(0, NUM_SQUARE_TYPE);
 	
 	//プレイヤー生成と初期化
 	string name;
@@ -29,7 +30,7 @@ Scene::Scene()
 	cout << "ゲームが始まります";
 	cin.clear();
 	cin.ignore(500,'\n');
-	Sleep(WaitTime);
+	Sleep(WAIT_TIME);
 
 	Player player = Player(0, icon, name, true);
 	Player NPC1 = Player(1, 'C', "Curly", false);
@@ -41,11 +42,10 @@ Scene::Scene()
 	players.push_back(NPC2);
 	players.push_back(NPC3);
 
-	board = Board(40);
+	board = Board(BOARD_LENGTH);
 
 	Draw();
 };
-
 
 void Scene::Run()
 {
@@ -56,9 +56,7 @@ void Scene::Run()
 		//イテレータを生成してリストに登録されたプレイヤー毎に行動する
 		for (auto player = players.begin(); player != players.end(); ++player)
 		{
-			cout << player->GetName() << "の手番です\n";
-
-			Sleep(WaitTime);
+			DrawLineAtIntervals(player->GetName() + "の手番です\n", WAIT_TIME);
 
 			if (player->CanMove())
 			{
@@ -69,10 +67,10 @@ void Scene::Run()
 			else
 			{
 				cout << "一回休みです";
-				player->AddTurn();
+				player->Revive();
 			}
 
-			Sleep(WaitTime);
+			Sleep(WAIT_TIME);
 			Draw();
 
 			if (isGoal)
@@ -91,27 +89,22 @@ int Scene::RollDice(Player* player)
 		getchar();
 	}
 
+	DrawLineAtIntervals("出た目の数は...", WAIT_TIME);
+
 	int roll = 0;
 	int sum = 0;
 
-	if (player->GetTurn() < 1)
-		player->AddTurn();
-
-	cout << "出た目の数は...";
-	Sleep(WaitTime);
-
+	//サイコロの数だけ振る
 	for (int i = 0; i < player->GetNumDice(); i++)
 	{
 		if (i > 0)
 		{
-			cout << " + ";
-			Sleep(WaitTime);
+			DrawLineAtIntervals(" + ", WAIT_TIME);
 		}
 
 		roll = diceDist(mt);
 		sum += roll;
-		cout << roll;
-		Sleep(WaitTime);
+		DrawLineAtIntervals(std::to_string(roll), WAIT_TIME);
 	}
 
 	if (player->GetNumDice() > 1)
@@ -120,9 +113,8 @@ int Scene::RollDice(Player* player)
 
 		player->ResetNumDice();
 	}
-
-	cout << "です\n";
-	Sleep(WaitTime);
+	
+	DrawLineAtIntervals("です\n", WAIT_TIME);
 
 	return sum;
 };
@@ -132,12 +124,16 @@ void Scene::ProcessMovement(Player* player, int numRollOfDice)
 	//移動(1マスずつ移動する演出)
 	MovePlayerByStep(player, numRollOfDice, 1);
 
-	//移動先のマスの効果適用
-	board.GetSquare(player->GetPos()).ApplyEffect(&(*player), precedingPlayer);
-	if (board.GetSquare(player->GetPos()).GetType() != sqStat::Blank)
-	{
-		Sleep(WaitTime_Long);
+	int playerPos = player->GetPos();
 
+	//移動先のマスの効果適用
+	board.GetSquare(playerPos).ApplyEffect(&(*player), precedingPlayer);
+
+	if (board.GetSquare(playerPos).GetType() != sqStat::Blank)
+	{
+		Sleep(WAIT_TIME_LONG);
+
+		//前進・後退マスに入っていた場合、その分だけ1マスずつ移動
 		if (player->GetDestination() > 0)
 		{
 			MovePlayerByStep(player, player->GetDestination(), 1);
@@ -149,20 +145,24 @@ void Scene::ProcessMovement(Player* player, int numRollOfDice)
 	}
 }
 
-void Scene::MovePlayerByStep(Player* player, int numSteps, int step)
+void Scene::MovePlayerByStep(Player* player, int numSteps, int lengthByStep)
 {
+	int playerPos = player->GetPos();
+
 	for (int i = 0; i < numSteps; i++)
 	{
-		player->Move(step);
+		player->Move(lengthByStep);
 		Draw();
-		Sleep(WaitTime);
+		Sleep(WAIT_TIME);
 
-		if (player->GetPos() >= 30)
+		if (playerPos >= board.GetLength())
 		{
-			player->SetPos(board.Length());
+			player->SetPos(board.GetLength());
 			Draw();
+			
 			winnerName = player->GetName();
 			isGoal = true;
+
 			return;
 		}
 	}
@@ -170,12 +170,12 @@ void Scene::MovePlayerByStep(Player* player, int numSteps, int step)
 	player->SetDestination(0);
 
 	for (auto itr = players.begin(); itr != players.end(); ++itr) {
-		if (player->GetPos() < itr->GetPos())
+		if (playerPos < itr->GetPos())
 		{
 			break;
 		}
 		
-		if(player->GetPos() > itr->GetPos())
+		if(playerPos > itr->GetPos())
 		{
 			precedingPlayer = &(*player);
 		}
@@ -201,11 +201,11 @@ void Scene::DrawPlayerSpace(string first, string middle, string space, string en
 
 		cout << middle;
 
-		for (auto Character = players.begin(); Character != players.end(); ++Character)
+		for (auto player = players.begin(); player != players.end(); ++player)
 		{
-			if (drawIndex == Character->GetPos())
+			if (drawIndex == player->GetPos())
 			{
-				cout << Character->GetIcon();
+				cout << player->GetIcon();
 			}
 			else
 			{
@@ -215,7 +215,13 @@ void Scene::DrawPlayerSpace(string first, string middle, string space, string en
 	}
 
 	cout << end;
-};
+}
+
+void Scene::DrawLineAtIntervals(string line, int intervals)
+{
+	cout << line;
+	Sleep(intervals);
+}
 
 void Scene::Draw()
 {
@@ -237,19 +243,26 @@ void Scene::Draw()
 	for (auto Character = players.begin(); Character != players.end(); ++Character)
 	{
 		cout << "\n " << Character->GetName() << " : ";
+
 		if (!Character->CanMove())
+		{
 			cout << "一回休み";
+		}
 		else if (Character->GetNumDice() > 1)
+		{
 			cout << "サイコロ+1";
+		}
 		else
+		{
 			cout << "ふつう";
+		}
+
 		cout << "\n\n";
 	}
 };
 
 void Scene::Result()
 {
-	cout << winnerName << "がゴール！\n";
-	Sleep(WaitTime);
+	DrawLineAtIntervals(winnerName + "がゴール！\n", WAIT_TIME);
 	cout << "到達までにかかった回数 : " << numTurn << "\n";
 };
