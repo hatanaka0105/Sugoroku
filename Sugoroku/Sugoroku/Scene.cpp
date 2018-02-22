@@ -143,19 +143,30 @@ void Scene::ProcessMovement(Player* player, int numRollOfDice)
 			MovePlayerByStep(player, -player->GetDestination(), -1);
 		}
 	}
+
+	//行動を終える前にこのプレイヤーが先頭を行っているか確認する
+	for (auto itr = players.begin(); itr != players.end(); ++itr) {
+		if (playerPos < itr->GetPos())
+		{
+			break;
+		}
+
+		if (playerPos > itr->GetPos())
+		{
+			precedingPlayer = &(*player);
+		}
+	}
 }
 
 void Scene::MovePlayerByStep(Player* player, int numSteps, int lengthByStep)
 {
-	int playerPos = player->GetPos();
-
 	for (int i = 0; i < numSteps; i++)
 	{
 		player->Move(lengthByStep);
 		Draw();
 		Sleep(WAIT_TIME);
 
-		if (playerPos >= board.GetLength())
+		if (player->GetPos() >= board.GetLength())
 		{
 			player->SetPos(board.GetLength());
 			Draw();
@@ -168,18 +179,6 @@ void Scene::MovePlayerByStep(Player* player, int numSteps, int lengthByStep)
 	}
 
 	player->SetDestination(0);
-
-	for (auto itr = players.begin(); itr != players.end(); ++itr) {
-		if (playerPos < itr->GetPos())
-		{
-			break;
-		}
-		
-		if(playerPos > itr->GetPos())
-		{
-			precedingPlayer = &(*player);
-		}
-	}
 }
 
 void Scene::DrawRowFrame(string first, string middle, string end, int numTurn)
