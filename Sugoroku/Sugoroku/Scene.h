@@ -38,7 +38,7 @@ public:
 	void TurnUpdate() { numTurn++; }
 
 	void Run();
-	int RollDice(Player* target);
+	int RollDice(Player &target);
 	void ProcessMovement(Player* target, int numRollOfDice);
 	void MovePlayerByStep(Player* target, int numSteps, int lengthByStep);
 
