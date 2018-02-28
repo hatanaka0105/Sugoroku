@@ -1,6 +1,5 @@
 #include "Scene.h"
 
-#define NUM_PLAYER 4
 #define WAIT_TIME 500
 #define WAIT_TIME_LONG 900
 #define BOARD_LENGTH 40
@@ -13,8 +12,6 @@ Scene::Scene()
 	
 	//ダイス用
 	diceDist = uniform_int_distribution<int>(1, 6);
-	//プレイヤーの順番用
-	playerOrderDist = uniform_int_distribution<int>(0, NUM_PLAYER);
 	//マス生成用
 	squareStateDist = uniform_int_distribution<int>(0, NUM_SQUARE_TYPE);
 	
