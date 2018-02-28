@@ -26,7 +26,6 @@ private:
 
 	mt19937 mt;
 	uniform_int_distribution<int> diceDist;
-	uniform_int_distribution<int> playerOrderDist;
 	uniform_int_distribution<int> squareStateDist;
 
 	bool isGoal;
