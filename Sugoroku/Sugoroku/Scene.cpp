@@ -169,7 +169,6 @@ void Scene::MovePlayerByStep(Player* player, int numSteps, int lengthByStep)
 		if (player->GetPos() >= board.GetLength())
 		{
 			player->SetPos(board.GetLength());
-			Draw();
 			
 			winnerName = player->GetName();
 			isGoal = true;
