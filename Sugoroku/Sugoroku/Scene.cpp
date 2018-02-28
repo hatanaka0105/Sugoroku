@@ -7,27 +7,27 @@
 
 Scene::Scene()
 {
-	//Œˆ’è“I—”¶¬(ƒƒ‹ƒZƒ“ƒkEƒcƒCƒXƒ^)
+	//æ±ºå®šçš„ä¹±æ•°ç”Ÿæˆ(ãƒ¡ãƒ«ã‚»ãƒ³ãƒŒãƒ»ãƒ„ã‚¤ã‚¹ã‚¿)
 	random_device rnd;
 	mt = mt19937(rnd());
 	
-	//ƒ_ƒCƒX—p
+	//ãƒ€ã‚¤ã‚¹ç”¨
 	diceDist = uniform_int_distribution<int>(1, 6);
-	//ƒvƒŒƒCƒ„[‚Ì‡”Ô—p
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®é †ç•ªç”¨
 	playerOrderDist = uniform_int_distribution<int>(0, NUM_PLAYER);
-	//ƒ}ƒX¶¬—p
+	//ãƒã‚¹ç”Ÿæˆç”¨
 	squareStateDist = uniform_int_distribution<int>(0, NUM_SQUARE_TYPE);
 	
-	//ƒvƒŒƒCƒ„[¶¬‚Æ‰Šú‰»
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç”Ÿæˆã¨åˆæœŸåŒ–
 	string name;
-	cout << "ƒvƒŒƒCƒ„[‚Ì–¼‘O‚ğİ’è‚µ‚Ü‚·\n –¼‘O : ";
+	cout << "ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åå‰ã‚’è¨­å®šã—ã¾ã™\n åå‰ : ";
 	cin >> name;
 
 	char icon;
-	cout << "\nŸ‚ÉA " << name << " ‚³‚ñ‚ÌƒAƒCƒRƒ“‚ğİ’è‚µ‚Ü‚·\n ƒAƒCƒRƒ“ : ";
+	cout << "\næ¬¡ã«ã€ " << name << " ã•ã‚“ã®ã‚¢ã‚¤ã‚³ãƒ³ã‚’è¨­å®šã—ã¾ã™\n ã‚¢ã‚¤ã‚³ãƒ³ : ";
 	cin >> icon;
 
-	cout << "ƒQ[ƒ€‚ªn‚Ü‚è‚Ü‚·";
+	cout << "ã‚²ãƒ¼ãƒ ãŒå§‹ã¾ã‚Šã¾ã™";
 	cin.clear();
 	cin.ignore(500,'\n');
 	Sleep(WAIT_TIME);
@@ -53,20 +53,20 @@ void Scene::Run()
 	{
 		TurnUpdate();
 
-		//ƒCƒeƒŒ[ƒ^‚ğ¶¬‚µ‚ÄƒŠƒXƒg‚É“o˜^‚³‚ê‚½ƒvƒŒƒCƒ„[–ˆ‚És“®‚·‚é
+		//ã‚¤ãƒ†ãƒ¬ãƒ¼ã‚¿ã‚’ç”Ÿæˆã—ã¦ãƒªã‚¹ãƒˆã«ç™»éŒ²ã•ã‚ŒãŸãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æ¯ã«è¡Œå‹•ã™ã‚‹
 		for (auto player = players.begin(); player != players.end(); ++player)
 		{
-			DrawLineAtIntervals(player->GetName() + "‚Ìè”Ô‚Å‚·\n", WAIT_TIME);
+			DrawLineAtIntervals(player->GetName() + "ã®æ‰‹ç•ªã§ã™\n", WAIT_TIME);
 
 			if (player->CanMove())
 			{
-				int numRollOfDice = RollDice(&(*player));
+				int numRollOfDice = RollDice(*player);
 
 				ProcessMovement(&(*player), numRollOfDice);
 			}
 			else
 			{
-				cout << "ˆê‰ñ‹x‚İ‚Å‚·";
+				cout << "ä¸€å›ä¼‘ã¿ã§ã™";
 				player->Revive();
 			}
 
@@ -81,21 +81,21 @@ void Scene::Run()
 	}
 };
 
-int Scene::RollDice(Player* player)
+int Scene::RollDice(Player &player)
 {
-	if (player->IsHuman())
+	if (player.IsHuman())
 	{
-		cout << "EnterƒL[‚ÅƒTƒCƒRƒ‚ğU‚è‚Ü‚·\n";
+		cout << "Enterã‚­ãƒ¼ã§ã‚µã‚¤ã‚³ãƒ­ã‚’æŒ¯ã‚Šã¾ã™\n";
 		getchar();
 	}
 
-	DrawLineAtIntervals("o‚½–Ú‚Ì”‚Í...", WAIT_TIME);
+	DrawLineAtIntervals("å‡ºãŸç›®ã®æ•°ã¯...", WAIT_TIME);
 
 	int roll = 0;
 	int sum = 0;
 
-	//ƒTƒCƒRƒ‚Ì”‚¾‚¯U‚é
-	for (int i = 0; i < player->GetNumDice(); i++)
+	//ã‚µã‚¤ã‚³ãƒ­ã®æ•°ã ã‘æŒ¯ã‚‹
+	for (int i = 0; i < player.GetNumDice(); i++)
 	{
 		if (i > 0)
 		{
@@ -107,33 +107,33 @@ int Scene::RollDice(Player* player)
 		DrawLineAtIntervals(std::to_string(roll), WAIT_TIME);
 	}
 
-	if (player->GetNumDice() > 1)
+	if (player.GetNumDice() > 1)
 	{
 		cout << " = " << sum;
 
-		player->ResetNumDice();
+		player.ResetNumDice();
 	}
 	
-	DrawLineAtIntervals("‚Å‚·\n", WAIT_TIME);
+	DrawLineAtIntervals("ã§ã™\n", WAIT_TIME);
 
 	return sum;
 };
 
 void Scene::ProcessMovement(Player* player, int numRollOfDice)
 {
-	//ˆÚ“®(1ƒ}ƒX‚¸‚ÂˆÚ“®‚·‚é‰‰o)
+	//ç§»å‹•(1ãƒã‚¹ãšã¤ç§»å‹•ã™ã‚‹æ¼”å‡º)
 	MovePlayerByStep(player, numRollOfDice, 1);
 
 	int playerPos = player->GetPos();
 
-	//ˆÚ“®æ‚Ìƒ}ƒX‚ÌŒø‰Ê“K—p
+	//ç§»å‹•å…ˆã®ãƒã‚¹ã®åŠ¹æœé©ç”¨
 	board.GetSquare(playerPos).ApplyEffect(&(*player), precedingPlayer);
 
 	if (board.GetSquare(playerPos).GetType() != sqStat::Blank)
 	{
 		Sleep(WAIT_TIME_LONG);
 
-		//‘OiEŒã‘Şƒ}ƒX‚É“ü‚Á‚Ä‚¢‚½ê‡A‚»‚Ì•ª‚¾‚¯1ƒ}ƒX‚¸‚ÂˆÚ“®
+		//å‰é€²ãƒ»å¾Œé€€ãƒã‚¹ã«å…¥ã£ã¦ã„ãŸå ´åˆã€ãã®åˆ†ã ã‘1ãƒã‚¹ãšã¤ç§»å‹•
 		if (player->GetDestination() > 0)
 		{
 			MovePlayerByStep(player, player->GetDestination(), 1);
@@ -144,7 +144,7 @@ void Scene::ProcessMovement(Player* player, int numRollOfDice)
 		}
 	}
 
-	//s“®‚ğI‚¦‚é‘O‚É‚±‚ÌƒvƒŒƒCƒ„[‚ªæ“ª‚ğs‚Á‚Ä‚¢‚é‚©Šm”F‚·‚é
+	//è¡Œå‹•ã‚’çµ‚ãˆã‚‹å‰ã«ã“ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒå…ˆé ­ã‚’è¡Œã£ã¦ã„ã‚‹ã‹ç¢ºèªã™ã‚‹
 	for (auto itr = players.begin(); itr != players.end(); ++itr) {
 		if (playerPos < itr->GetPos())
 		{
@@ -228,16 +228,16 @@ void Scene::Draw()
 
 	system("cls");
 
-	DrawRowFrame("„¡", "„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„¦", "„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„¢\n", 9);
+	DrawRowFrame("â”Œ", "â”€â”€â”€â”€â”€â”¬", "â”€â”€â”€â”€â”€â”\n", 9);
 
 	for (int i = 0; i < 2; i++)
 	{
-		DrawPlayerSpace("", "„  ", " ", "„ \n", 10);
-		DrawRowFrame("„¥", "„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„©", "„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„§\n", 9);
+		DrawPlayerSpace("", "â”‚ ", " ", "â”‚\n", 10);
+		DrawRowFrame("â”œ", "â”€â”€â”€â”€â”€â”¼", "â”€â”€â”€â”€â”€â”¤\n", 9);
 	}
 
-	DrawPlayerSpace("", "„  ", " ", "„ \n", 10);
-	DrawRowFrame("„¤", "„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„¨", "„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„£\n", 9);
+	DrawPlayerSpace("", "â”‚ ", " ", "â”‚\n", 10);
+	DrawRowFrame("â””", "â”€â”€â”€â”€â”€â”´", "â”€â”€â”€â”€â”€â”˜\n", 9);
 
 	for (auto Character = players.begin(); Character != players.end(); ++Character)
 	{
@@ -245,15 +245,15 @@ void Scene::Draw()
 
 		if (!Character->CanMove())
 		{
-			cout << "ˆê‰ñ‹x‚İ";
+			cout << "ä¸€å›ä¼‘ã¿";
 		}
 		else if (Character->GetNumDice() > 1)
 		{
-			cout << "ƒTƒCƒRƒ+1";
+			cout << "ã‚µã‚¤ã‚³ãƒ­+1";
 		}
 		else
 		{
-			cout << "‚Ó‚Â‚¤";
+			cout << "ãµã¤ã†";
 		}
 
 		cout << "\n\n";
@@ -262,6 +262,6 @@ void Scene::Draw()
 
 void Scene::Result()
 {
-	DrawLineAtIntervals(winnerName + "‚ªƒS[ƒ‹I\n", WAIT_TIME);
-	cout << "“’B‚Ü‚Å‚É‚©‚©‚Á‚½‰ñ” : " << numTurn << "\n";
+	DrawLineAtIntervals(winnerName + "ãŒã‚´ãƒ¼ãƒ«ï¼\n", WAIT_TIME);
+	cout << "åˆ°é”ã¾ã§ã«ã‹ã‹ã£ãŸå›æ•° : " << numTurn << "\n";
 };
