@@ -2,7 +2,7 @@
 
 #define WAIT_TIME 500
 #define WAIT_TIME_LONG 900
-#define BOARD_LENGTH 40
+#define BOARD_LENGTH 30
 
 Scene::Scene()
 {
@@ -63,7 +63,7 @@ void Scene::Run()
 			}
 			else
 			{
-				cout << "一回休みです";;
+				cout << "一回休みです";
 				player->Revive();
 			}
 
@@ -123,6 +123,19 @@ void Scene::ProcessMovement(Player &player, int numRollOfDice)
 
 	int playerPos = player.GetPos();
 
+	//swapマス到達の前にこのプレイヤーが先頭を行っているか確認する
+	for (auto itr = players.begin(); itr != players.end(); ++itr) {
+		if (playerPos < itr->GetPos())
+		{
+			break;
+		}
+
+		if (playerPos > itr->GetPos())
+		{
+			precedingPlayer = &player;
+		}
+	}
+
 	//移動先のマスの効果適用
 	board.GetSquare(playerPos).ApplyEffect(player, *precedingPlayer);
 
@@ -140,19 +153,6 @@ void Scene::ProcessMovement(Player &player, int numRollOfDice)
 			MovePlayerByStep(player, -player.GetDestination(), -1);
 		}
 	}
-
-	//行動を終える前にこのプレイヤーが先頭を行っているか確認する
-	for (auto itr = players.begin(); itr != players.end(); ++itr) {
-		if (playerPos < itr->GetPos())
-		{
-			break;
-		}
-
-		if (playerPos > itr->GetPos())
-		{
-			precedingPlayer = &player;
-		}
-	}
 }
 
 void Scene::MovePlayerByStep(Player& player, int numSteps, int lengthByStep)
@@ -167,7 +167,6 @@ void Scene::MovePlayerByStep(Player& player, int numSteps, int lengthByStep)
 		{
 			player.SetPos(board.GetLength());
 			
-			winnerName = player.GetName();
 			isGoal = true;
 
 			return;
@@ -258,6 +257,6 @@ void Scene::Draw()
 
 void Scene::Result()
 {
-	DrawLineAtIntervals(winnerName + "がゴール！\n", WAIT_TIME);
+	DrawLineAtIntervals(precedingPlayer->GetName() + "がゴール！\n", WAIT_TIME);
 	cout << "到達までにかかった回数 : " << numTurn << "\n";
 };

@@ -29,7 +29,6 @@ private:
 	uniform_int_distribution<int> squareStateDist;
 
 	bool isGoal;
-	string winnerName;
 
 public:
 	Scene();
