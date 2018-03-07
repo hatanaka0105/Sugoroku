@@ -59,11 +59,11 @@ void Scene::Run()
 			{
 				int numRollOfDice = RollDice(*player);
 
-				ProcessMovement(&(*player), numRollOfDice);
+				ProcessMovement(*player, numRollOfDice);
 			}
 			else
 			{
-				cout << "一回休みです";
+				cout << "一回休みです";;
 				player->Revive();
 			}
 
@@ -116,28 +116,28 @@ int Scene::RollDice(Player &player)
 	return sum;
 };
 
-void Scene::ProcessMovement(Player* player, int numRollOfDice)
+void Scene::ProcessMovement(Player &player, int numRollOfDice)
 {
 	//移動(1マスずつ移動する演出)
 	MovePlayerByStep(player, numRollOfDice, 1);
 
-	int playerPos = player->GetPos();
+	int playerPos = player.GetPos();
 
 	//移動先のマスの効果適用
-	board.GetSquare(playerPos).ApplyEffect(&(*player), precedingPlayer);
+	board.GetSquare(playerPos).ApplyEffect(player, *precedingPlayer);
 
 	if (board.GetSquare(playerPos).GetType() != sqStat::Blank)
 	{
 		Sleep(WAIT_TIME_LONG);
 
 		//前進・後退マスに入っていた場合、その分だけ1マスずつ移動
-		if (player->GetDestination() > 0)
+		if (player.GetDestination() > 0)
 		{
-			MovePlayerByStep(player, player->GetDestination(), 1);
+			MovePlayerByStep(player, player.GetDestination(), 1);
 		}
-		else if (player->GetDestination() < 0)
+		else if (player.GetDestination() < 0)
 		{
-			MovePlayerByStep(player, -player->GetDestination(), -1);
+			MovePlayerByStep(player, -player.GetDestination(), -1);
 		}
 	}
 
@@ -150,31 +150,31 @@ void Scene::ProcessMovement(Player* player, int numRollOfDice)
 
 		if (playerPos > itr->GetPos())
 		{
-			precedingPlayer = &(*player);
+			precedingPlayer = &player;
 		}
 	}
 }
 
-void Scene::MovePlayerByStep(Player* player, int numSteps, int lengthByStep)
+void Scene::MovePlayerByStep(Player& player, int numSteps, int lengthByStep)
 {
 	for (int i = 0; i < numSteps; i++)
 	{
-		player->Move(lengthByStep);
+		player.Move(lengthByStep);
 		Draw();
 		Sleep(WAIT_TIME);
 
-		if (player->GetPos() >= board.GetLength())
+		if (player.GetPos() >= board.GetLength())
 		{
-			player->SetPos(board.GetLength());
+			player.SetPos(board.GetLength());
 			
-			winnerName = player->GetName();
+			winnerName = player.GetName();
 			isGoal = true;
 
 			return;
 		}
 	}
 
-	player->SetDestination(0);
+	player.SetDestination(0);
 }
 
 void Scene::DrawRowFrame(string first, string middle, string end, int numTurn)

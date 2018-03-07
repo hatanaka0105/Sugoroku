@@ -30,7 +30,7 @@ namespace sqStat
 
 		void SquareChange(Type state) { type_ = state; }
 
-		void ApplyEffect(Player* player, Player* swapTarget);
+		void ApplyEffect(Player& player, Player& swapTarget);
 
 		Type GetType() const { return type_; }
 	};

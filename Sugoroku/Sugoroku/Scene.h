@@ -38,8 +38,8 @@ public:
 
 	void Run();
 	int RollDice(Player &target);
-	void ProcessMovement(Player* target, int numRollOfDice);
-	void MovePlayerByStep(Player* target, int numSteps, int lengthByStep);
+	void ProcessMovement(Player& target, int numRollOfDice);
+	void MovePlayerByStep(Player& target, int numSteps, int lengthByStep);
 
 	void Draw();
 	void DrawRowFrame(string first, string middle, string end, int numTurn);
