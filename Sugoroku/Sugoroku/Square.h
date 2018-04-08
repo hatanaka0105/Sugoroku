@@ -26,7 +26,7 @@ namespace sqStat
 
 	public:
 		void Initialize();
-		void Initialize(Type state, int pos);
+		void Initialize(Type state, int effectAmount);
 
 		void SquareChange(Type state) { type_ = state; }
 

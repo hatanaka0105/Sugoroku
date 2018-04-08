@@ -60,6 +60,11 @@ void Scene::Run()
 				int numRollOfDice = RollDice(*player);
 
 				ProcessMovement(*player, numRollOfDice);
+
+				if (isGoal)
+				{
+					return;
+				}
 			}
 			else
 			{
@@ -70,10 +75,7 @@ void Scene::Run()
 			Sleep(WAIT_TIME);
 			Draw();
 
-			if (isGoal)
-			{
-				return;
-			}
+
 		}
 	}
 };
@@ -121,23 +123,18 @@ void Scene::ProcessMovement(Player &player, int numRollOfDice)
 	//移動(1マスずつ移動する演出)
 	MovePlayerByStep(player, numRollOfDice, 1);
 
-	int playerPos = player.GetPos();
-
-	//swapマス到達の前にこのプレイヤーが先頭を行っているか確認する
-	for (auto itr = players.begin(); itr != players.end(); ++itr) {
-		if (playerPos < itr->GetPos())
-		{
-			break;
-		}
-
-		if (playerPos > itr->GetPos())
-		{
-			precedingPlayer = &player;
-		}
+	if (isGoal)
+	{
+		return;
 	}
+
+	int playerPos = player.GetPos();
 
 	//移動先のマスの効果適用
 	board.GetSquare(playerPos).ApplyEffect(player, *precedingPlayer);
+
+	//Swapマスの前に先行しているかどうか確認しておく
+	CheckPrecedingPlayer(player);
 
 	if (board.GetSquare(playerPos).GetType() != sqStat::Blank)
 	{
@@ -152,6 +149,9 @@ void Scene::ProcessMovement(Player &player, int numRollOfDice)
 		{
 			MovePlayerByStep(player, -player.GetDestination(), -1);
 		}
+
+		//移動効果マスの後に順位が変化している可能性があるので確認する
+		CheckPrecedingPlayer(player);
 	}
 }
 
@@ -163,17 +163,38 @@ void Scene::MovePlayerByStep(Player& player, int numSteps, int lengthByStep)
 		Draw();
 		Sleep(WAIT_TIME);
 
+		//ゴール時
 		if (player.GetPos() >= board.GetLength())
 		{
 			player.SetPos(board.GetLength());
 			
 			isGoal = true;
 
+			precedingPlayer = &player;
+
 			return;
 		}
 	}
 
 	player.SetDestination(0);
+}
+
+void Scene::CheckPrecedingPlayer(Player& player)
+{
+	int playerPos = player.GetPos();
+
+	for (auto itr = players.begin(); itr != players.end(); ++itr) 
+	{
+		if (playerPos < itr->GetPos())
+		{
+			break;
+		}
+
+		if (playerPos > itr->GetPos())
+		{
+			precedingPlayer = &player;
+		}
+	}
 }
 
 void Scene::DrawRowFrame(string first, string middle, string end, int numTurn)
@@ -234,6 +255,7 @@ void Scene::Draw()
 	DrawPlayerSpace("", "│ ", " ", "│\n", 10);
 	DrawRowFrame("└", "─────┴", "─────┘\n", 9);
 
+	//各プレイヤーの状態を描画
 	for (auto Character = players.begin(); Character != players.end(); ++Character)
 	{
 		cout << "\n " << Character->GetName() << " : ";

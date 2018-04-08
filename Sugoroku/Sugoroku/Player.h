@@ -7,7 +7,7 @@
 #define NOMINMAX
 #define min(a,b)            (((a) < (b)) ? (a) : (b))
 #define max(a,b)            (((a) > (b)) ? (a) : (b))
-#define CLAMP(x, low, high) min(max(high, x), low)
+#define CLAMP(x, low, high) max(min(high, x), low)
 
 using namespace std;
 
